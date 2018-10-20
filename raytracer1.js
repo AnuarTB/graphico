@@ -49,7 +49,7 @@ function Vec3(x, y, z){
   this.z = z;
 
   this.len2 = function(){
-    return this.x * this.x + this.y * this.y + this.z * this.z;
+    return dot(this, this);
   }
   this.len = function(){
     return Math.sqrt(this.len2());
@@ -109,9 +109,9 @@ function solveQuadraticEquation(a, b, c){
 
 //Inits scene with objects
 function initScene(){
-  scene_objs.push(new Sphere(new Vec3(0, 0, 3), 0.3, new Vec3(255, 128, 128)));
-  scene_objs.push(new Sphere(new Vec3(1, 1, 3), 0.2, new Vec3(128, 255, 255)));
-  scene_objs.push(new Sphere(new Vec3(-0.5, 0.7, 2), 0.2, new Vec3(170, 76, 76)));
+  scene_objs.push(new Sphere(new Vec3(0, -1, 3), 1, new Vec3(255, 0, 0)));
+  scene_objs.push(new Sphere(new Vec3(2, 0, 4), 1, new Vec3(0, 0, 255)));
+  scene_objs.push(new Sphere(new Vec3(-2, 0, 4), 1, new Vec3(0, 255, 0)));
 }
 
 //x and y are given in *canvas* coordinates. 
