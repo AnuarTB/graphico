@@ -48,20 +48,20 @@ function makeMatrix(n, m){
 }
 
 //Class for 3D vectors
-function Vec3(x, y, z){
-  this.x = x;
-  this.y = y;
-  this.z = z;
-
-  this.len2 = function(){
-    return dot(this, this);
-  }
-  this.len = function(){
-    return Math.sqrt(this.len2());
-  }
-
-  this.scale = function(c){
-    return new Vec3(c * this.x, c * this.y, c * this.z);
+class Vec3 {
+  constructor(x, y, z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.len2 = function () {
+      return dot(this, this);
+    };
+    this.len = function () {
+      return Math.sqrt(this.len2());
+    };
+    this.scale = function (c) {
+      return new Vec3(c * this.x, c * this.y, c * this.z);
+    };
   }
 }
 
@@ -82,44 +82,57 @@ function cross(a, b){
 }
 
 //Class for the sphere
-function Sphere(pos, r, color){
-  this.pos = pos;
-  this.r = r;
-  this.color = color;
-  this.intersection = function(p, d){
-    var tmp = sub(p, this.pos);
-    var a = dot(d, d);
-    var b = dot(tmp, d) * 2;
-    var c = dot(tmp, tmp) - this.r * this.r;
-    var sols = solveQuadraticEquation(a, b, c);
-    var ret = -1;
-    for(let i = 0; i < sols.length; ++i){
-      if(sols[i] > 1 && (ret == -1 || sols[i] < ret)){
-        ret = sols[i];
+class Sphere {
+  constructor(pos, r, color) {
+    this.pos = pos;
+    this.r = r;
+    this.color = color;
+    this.intersection = function (p, d) {
+      var tmp = sub(p, this.pos);
+      var a = dot(d, d);
+      var b = dot(tmp, d) * 2;
+      var c = dot(tmp, tmp) - this.r * this.r;
+      var sols = solveQuadraticEquation(a, b, c);
+      var ret = -1;
+      for (let i = 0; i < sols.length; ++i) {
+        if (sols[i] > 1 && (ret == -1 || sols[i] < ret)) {
+          ret = sols[i];
+        }
       }
-    }
-    return ret;
+      return ret;
+    };
   }
 }
 
 //class for the light objects
-function Light(type, intensity, pos){
-  this.type = type;
-  this.intensity = intensity;
-  this.pos = pos; // in the directional case it is direction vector
-
-  this.calc_diffuse_intensity = function(n, p){
-    var mult;
-    var tmp;
-    if(this.type == LIGHT_TYPE.ambient){
-      mult = 1;
-    }
-    else {
-      var l = (this.type == LIGHT_TYPE.directional ? this.pos : sub(this.pos, p));
-      tmp = dot(n, l);
-      mult = (tmp > 0 ? dot(n, l) / l.len() : 0);
-    }
-    return this.intensity * mult;
+class Light {
+  constructor(type, intensity, pos) {
+    this.type = type;
+    this.intensity = intensity;
+    this.pos = pos; // in the directional case it is direction vector
+    this.calc_intensity = function (n, p, s = -1) {
+      var final_intensity = 0;
+      var tmp;
+      if (this.type == LIGHT_TYPE.ambient) {
+        final_intensity = this.intensity;
+      }
+      else {
+        //diffuse
+        var l = (this.type == LIGHT_TYPE.directional ? this.pos : sub(this.pos, p));
+        tmp = dot(n, l);
+        if (tmp > 0)
+          final_intensity += this.intensity * tmp / l.len();
+        //specular
+        if (s != -1) {
+          var r = sub(n.scale(2 * dot(n, l)), l);
+          var v = p.scale(-1);
+          tmp = dot(r, v);
+          if (tmp > 0)
+            final_intensity += this.intensity * Math.pow(tmp / (r.len() * v.len()), s);
+        }
+      }
+      return final_intensity;
+    };
   }
 }
 
@@ -156,6 +169,7 @@ function determineColorOfPixel(x, y){
   var v_x = s_x / c.width;
   var v_y = s_y / c.height;
   var v_z = 1;
+
   var ray_vect = new Vec3(v_x, v_y, v_z);
   var origin = new Vec3(0, 0, 0);
   var closest_obj_id = -1;
