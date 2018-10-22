@@ -38,15 +38,6 @@ function putPixel(x, y, col){
   img_data.data[ind + 3] = 255;
 }
 
-//Make matrix of dimensions n * m
-function makeMatrix(n, m){
-  var ret = new Array(n);
-  for(let i = 0; i < n; ++i){
-    ret[i] = new Array(m);
-  }
-  return ret;
-}
-
 //Class for 3D vectors
 class Vec3 {
   constructor(x, y, z) {
@@ -83,10 +74,11 @@ function cross(a, b){
 
 //Class for the sphere
 class Sphere {
-  constructor(pos, r, color) {
+  constructor(pos, r, color, specular) {
     this.pos = pos;
     this.r = r;
     this.color = color;
+    this.specular = specular;
     this.intersection = function (p, d) {
       var tmp = sub(p, this.pos);
       var a = dot(d, d);
@@ -152,10 +144,26 @@ function solveQuadraticEquation(a, b, c){
 
 //Inits scene with objects
 function initScene(){
-  scene_objs.push(new Sphere(new Vec3(0, -1, 3), 1, new Vec3(255, 0, 0)));
-  scene_objs.push(new Sphere(new Vec3(2, 0, 4), 1, new Vec3(0, 0, 255)));
-  scene_objs.push(new Sphere(new Vec3(-2, 0, 4), 1, new Vec3(0, 255, 0)));
-  scene_objs.push(new Sphere(new Vec3(0, -5001, 0), 5000, new Vec3(255, 255, 0)));
+  scene_objs.push(new Sphere(
+    new Vec3(0, -1, 3), 
+    1, 
+    new Vec3(255, 0, 0), 
+    500));
+  scene_objs.push(new Sphere(
+    new Vec3(2, 0, 4), 
+    1, 
+    new Vec3(0, 0, 255),
+    500));
+  scene_objs.push(new Sphere(
+    new Vec3(-2, 0, 4), 
+    1, 
+    new Vec3(0, 255, 0),
+    10));
+  scene_objs.push(new Sphere(
+    new Vec3(0, -5001, 0), 
+    5000, 
+    new Vec3(255, 255, 0),
+    1000));
 
   scene_lights.push(new Light(LIGHT_TYPE.ambient, 0.2));
   scene_lights.push(new Light(LIGHT_TYPE.point, 0.6, new Vec3(2, 1, 0)));
@@ -187,10 +195,13 @@ function determineColorOfPixel(x, y){
   }
   var collision_point = add(origin, ray_vect.scale(pixel_dist));
   var normal_vec = sub(collision_point, scene_objs[closest_obj_id].pos);
-  normal_vec.scale(1 / normal_vec.len()); //normalize to unit length
+  normal_vec = normal_vec.scale(1 / normal_vec.len()); //normalize to unit length
   var total_intensity = 0;
   for(let i = 0; i < scene_lights.length; ++i){
-    total_intensity += scene_lights[i].calc_diffuse_intensity(normal_vec, collision_point);
+    total_intensity += scene_lights[i].calc_intensity(
+      normal_vec, 
+      collision_point, 
+      scene_objs[closest_obj_id].specular);
   }
   return scene_objs[closest_obj_id].color.scale(total_intensity);
 }
