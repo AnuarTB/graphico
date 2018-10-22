@@ -38,15 +38,6 @@ function putPixel(x, y, col){
   img_data.data[ind + 3] = 255;
 }
 
-//Make matrix of dimensions n * m
-function makeMatrix(n, m){
-  var ret = new Array(n);
-  for(let i = 0; i < n; ++i){
-    ret[i] = new Array(m);
-  }
-  return ret;
-}
-
 //Class for 3D vectors
 function Vec3(x, y, z){
   this.x = x;
@@ -173,7 +164,7 @@ function determineColorOfPixel(x, y){
   }
   var collision_point = add(origin, ray_vect.scale(pixel_dist));
   var normal_vec = sub(collision_point, scene_objs[closest_obj_id].pos);
-  normal_vec.scale(1 / normal_vec.len()); //normalize to unit length
+  normal_vec = normal_vec.scale(1 / normal_vec.len()); //normalize to unit length
   var total_intensity = 0;
   for(let i = 0; i < scene_lights.length; ++i){
     total_intensity += scene_lights[i].calc_diffuse_intensity(normal_vec, collision_point);
