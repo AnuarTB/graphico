@@ -38,15 +38,6 @@ function putPixel(x, y, col){
   img_data.data[ind + 3] = 255;
 }
 
-//Make matrix of dimensions n * m
-function makeMatrix(n, m){
-  var ret = new Array(n);
-  for(let i = 0; i < n; ++i){
-    ret[i] = new Array(m);
-  }
-  return ret;
-}
-
 //Class for 3D vectors
 function Vec3(x, y, z){
   this.x = x;
@@ -95,7 +86,7 @@ function Sphere(pos, r, color){
     var ret = -1;
     for(let i = 0; i < sols.length; ++i){
       if(sols[i] > 1 && (ret == -1 || sols[i] < ret)){
-        ret = sols[i]
+        ret = sols[i];
       }
     }
     return ret;
@@ -114,19 +105,10 @@ function Light(type, intensity, pos){
     if(this.type == LIGHT_TYPE.ambient){
       mult = 1;
     }
-    else if (this.type == LIGHT_TYPE.directional){
-      tmp = dot(n, this.pos);
-      if(tmp > 0)
-        mult = dot(n, this.pos) / (n.len() * this.pos.len());
-      else 
-        mult = 0;
-    }
     else {
-      tmp = dot(n, sub(this.pos, p));
-      if(tmp > 0)
-        mult = dot(n, sub(this.pos, p)) / (n.len() * sub(this.pos, p).len());
-      else
-        mult = 0  
+      var l = (this.type == LIGHT_TYPE.directional ? this.pos : sub(this.pos, p));
+      tmp = dot(n, l);
+      mult = (tmp > 0 ? dot(n, l) / l.len() : 0);
     }
     return this.intensity * mult;
   }
@@ -165,7 +147,6 @@ function determineColorOfPixel(x, y){
   var v_x = s_x / c.width;
   var v_y = s_y / c.height;
   var v_z = 1;
-
   var ray_vect = new Vec3(v_x, v_y, v_z);
   var origin = new Vec3(0, 0, 0);
   var closest_obj_id = -1;
@@ -183,6 +164,7 @@ function determineColorOfPixel(x, y){
   }
   var collision_point = add(origin, ray_vect.scale(pixel_dist));
   var normal_vec = sub(collision_point, scene_objs[closest_obj_id].pos);
+  normal_vec = normal_vec.scale(1 / normal_vec.len()); //normalize to unit length
   var total_intensity = 0;
   for(let i = 0; i < scene_lights.length; ++i){
     total_intensity += scene_lights[i].calc_diffuse_intensity(normal_vec, collision_point);
