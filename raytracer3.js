@@ -74,18 +74,11 @@ function cross(a, b){
 
 //Class for the sphere
 class Sphere {
-<<<<<<< HEAD
-  constructor(pos, r, color) {
-    this.pos = pos;
-    this.r = r;
-    this.color = color;
-=======
   constructor(pos, r, color, specular) {
     this.pos = pos;
     this.r = r;
     this.color = color;
     this.specular = specular;
->>>>>>> 802a279b4f28ef83c45c09a4e3b052ba043bce04
     this.intersection = function (p, d) {
       var tmp = sub(p, this.pos);
       var a = dot(d, d);
@@ -151,12 +144,6 @@ function solveQuadraticEquation(a, b, c){
 
 //Inits scene with objects
 function initScene(){
-<<<<<<< HEAD
-  scene_objs.push(new Sphere(new Vec3(0, -1, 3), 1, new Vec3(255, 0, 0)));
-  scene_objs.push(new Sphere(new Vec3(2, 0, 4), 1, new Vec3(0, 0, 255)));
-  scene_objs.push(new Sphere(new Vec3(-2, 0, 4), 1, new Vec3(0, 255, 0)));
-  scene_objs.push(new Sphere(new Vec3(0, -5001, 0), 5000, new Vec3(255, 255, 0)));
-=======
   scene_objs.push(new Sphere(
     new Vec3(0, -1, 3), 
     1, 
@@ -177,7 +164,6 @@ function initScene(){
     5000, 
     new Vec3(255, 255, 0),
     1000));
->>>>>>> 802a279b4f28ef83c45c09a4e3b052ba043bce04
 
   scene_lights.push(new Light(LIGHT_TYPE.ambient, 0.2));
   scene_lights.push(new Light(LIGHT_TYPE.point, 0.6, new Vec3(2, 1, 0)));
@@ -209,12 +195,6 @@ function determineColorOfPixel(x, y){
   }
   var collision_point = add(origin, ray_vect.scale(pixel_dist));
   var normal_vec = sub(collision_point, scene_objs[closest_obj_id].pos);
-<<<<<<< HEAD
-  normal_vec.scale(1 / normal_vec.len()); //normalize to unit length
-  var total_intensity = 0;
-  for(let i = 0; i < scene_lights.length; ++i){
-    total_intensity += scene_lights[i].calc_diffuse_intensity(normal_vec, collision_point);
-=======
   normal_vec = normal_vec.scale(1 / normal_vec.len()); //normalize to unit length
   var total_intensity = 0;
   for(let i = 0; i < scene_lights.length; ++i){
@@ -222,7 +202,6 @@ function determineColorOfPixel(x, y){
       normal_vec, 
       collision_point, 
       scene_objs[closest_obj_id].specular);
->>>>>>> 802a279b4f28ef83c45c09a4e3b052ba043bce04
   }
   return scene_objs[closest_obj_id].color.scale(total_intensity);
 }
