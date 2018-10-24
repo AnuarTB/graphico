@@ -1,2 +1,2 @@
 # graphico
-My library for stuff related with graphics written in JS
+My implementation of algorithms related to computer graphics in JS. 
